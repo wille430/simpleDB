@@ -1,7 +1,7 @@
 import unittest
 from simpleDB.db import Database
 
-class TestDatabase():
+class TestDatabase(unittest.TestCase):
 
     def test_set(self):
         db = Database('test_db.db')
@@ -15,3 +15,6 @@ class TestDatabase():
         db.set(value, path)
         
         self.assertEqual(db.find(path), value)
+
+if __name__ == '__main__':
+    unittest.main()
