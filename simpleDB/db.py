@@ -36,6 +36,9 @@ class Database:
         with open(self.path, 'w') as f:
             json.dump(self.data, f)
 
+    def clear(self):
+        self.data = {}
+
     # users/userId ==> ['users', 'userId']
     def path_to_keys(self, path: str):
         return path.split('/')
@@ -45,7 +48,11 @@ class Database:
         keys = self.path_to_keys(path)
 
         # find nested values in data dict
-        retrieved_data = reduce(operator.getitem, keys, self.data)
+        try:
+            retrieved_data = reduce(operator.getitem, keys, self.data)
+        except:
+            # return None if not found
+            retrieved_data = None
 
         return retrieved_data
 
@@ -53,17 +60,23 @@ class Database:
         keys = self.path_to_keys(path)
 
         # delete nested key
-        self.data = reduce(operator.delitem, keys, self.data)
+        del reduce(operator.getitem, keys[:-1], self.data)[keys[-1]]
 
-    def set(self, value, path):
+    def set(self, path, value):
         keys = self.path_to_keys(path)
 
         # add value to nested dict
         reduce(self._getitem, keys[0:-1], self.data)[keys[-1]] = value
 
-    def append(self, value, path):
+        # return added value
+        return value
+
+    def append(self, path, value):
         # create new primary key
         uniqueId = self.generate_primary_key()
+        new_path = f'{path}/{uniqueId}'
 
         # add value to primary key
-        self.set(value, f'{path}/{uniqueId}')
+        self.set(new_path, value)
+
+        return (new_path, value)
