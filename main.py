@@ -3,17 +3,18 @@ from simpleDB.db import Database
 
 
 def main():
-    db = Database('database.db')
+    db = Database()
 
     cols = {
         'username': str,
         'password': str,
         'age': int
     }
-    new_table = Table('users', cols) 
-    db.create_table(new_table)
 
-    db.save()
+    db.create_table('users', cols)
+    db.table('users').insert({
+        'username': 'test123'
+    })
 
 
 if __name__ == '__main__':
