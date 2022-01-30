@@ -35,8 +35,10 @@ class Database:
         else:
             return None
 
-    # def clear(self):
-        # TODO: clear storage
+    def clear(self):
+        # FIXME: clear storage
+        self._tables = {}
+        self.storage.write({})
 
     # create table
     def create_table(self, name, cols):

@@ -1,12 +1,12 @@
 
 import json
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Dict
 
 from simpleDB.storage import Storage
 from simpleDB.utils import generate_primary_key
 
 
-class Row(dict[str, any]):
+class Row(Dict[str, any]):
     def __init__(self, value: Mapping[str, any]):
         super().__init__(value)
 
@@ -16,7 +16,7 @@ class Table:
         self,
         storage: Storage,
         name: str,
-        columns: dict[str, type]
+        columns: Dict[str, type]
     ):
         self._storage = storage
         self._name = name
@@ -31,7 +31,7 @@ class Table:
     def name(self):
         return self._name
 
-    def rows(self) -> dict[str, Row]:
+    def rows(self) -> Dict[str, Row]:
         """
         Get all rows in the table
 
@@ -79,7 +79,6 @@ class Table:
             return tables[self._name]
 
     def delete(self, row_id):
-        rows = self.rows().pop(row_id, None)
 
         def remove_row(table):
             try:
