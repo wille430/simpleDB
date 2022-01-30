@@ -21,13 +21,14 @@ class Database:
     def log(self, msg: str):
         print(msg)
 
-    def tables(self) -> dict:
+    def tables(self) -> dict[str, Table]:
+        """Get all tables in the database"""
         self._tables = self.storage.read()
 
         return self._tables
 
-    def table(self, table_name) -> Table:
-        # Find table by name
+    def table(self, table_name: str) -> Table:
+        """Find a table by name"""
 
         # Check if it exists in instance
         if table_name in self._tables:
@@ -36,17 +37,15 @@ class Database:
             return None
 
     def clear(self):
-        # FIXME: clear storage
+        """Resets the entire database"""
         self._tables = {}
         self.storage.write({})
 
     def create_table(self, name: str, cols) -> Table:
-        """
-        Create a table if it doesn't already exist.
-        Returns the table.
+        """Create a table if it doesn't already exist. Returns the table.
 
-        :param name: the name of the table
-        :param cols: a dict where the key is a string and the value a type
+        :param name: The name of the table
+        :param cols: A dict where the key is a string and the value a type
         """
         if not self.table(name):
             table = Table(self.storage, name, cols)

@@ -9,10 +9,16 @@ class Storage:
         print(f"Loaded db file ({self.size()}b)")
 
     def size(self):
+        """Get the file size
+
+        :return: The size of the file in bytes (int)
+        """
         self._file.seek(0, os.SEEK_END)
         return self._file.tell()
 
     def write(self, data: dict):
+        """Write the the data to the loaded file"""
+
         # move cursor to first line
         self._file.seek(0)
 
@@ -26,6 +32,8 @@ class Storage:
         print(f"Changes written to file ({self.size()}b)")
 
     def read(self):
+        """Read the loaded file"""
+
         # move cursor to first line
         self._file.seek(0)
 

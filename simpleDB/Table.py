@@ -1,5 +1,3 @@
-
-import json
 from typing import Callable, Mapping, Dict
 
 from simpleDB.storage import Storage
@@ -32,10 +30,9 @@ class Table:
         return self._name
 
     def rows(self) -> Dict[str, Row]:
-        """
-        Get all rows in the table
+        """Get all rows in the table
 
-        :returns: a list with all rows in table
+        :returns: A list with all rows in table
         """
 
         table = self._read_table()
@@ -67,10 +64,13 @@ class Table:
         # Write storage
         self._storage.write(tables)
 
-    def find(self, row_id: str):
+    def find(self, row_id: str) -> Row:
+        """Get a row by id"""
         return self.rows().get(row_id)
 
     def _read_table(self):
+        """Get table from database"""
+
         tables = self._storage.read()
 
         if tables is None:
@@ -79,6 +79,7 @@ class Table:
             return tables[self._name]
 
     def delete(self, row_id):
+        """Delete a row inside the table"""
 
         def remove_row(table):
             try:
