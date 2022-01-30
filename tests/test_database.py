@@ -30,6 +30,7 @@ class TestDatabase(unittest.TestCase):
     def tearDown(self):
         # clear db
         self.db.clear()
+        self.db.close()
 
     def test_clear(self):
         self.db.clear()

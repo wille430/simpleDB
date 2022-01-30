@@ -29,6 +29,10 @@ class TestTable(unittest.TestCase):
                 'isCool': False
             })
 
+    def tearDown(self):
+        self.db.clear()
+        self.db.close()
+
     def test_insert(self):
         value = {
             'username': '123',
@@ -65,3 +69,6 @@ class TestTable(unittest.TestCase):
 
         # expect to be none
         self.assertEqual(self.table.find(f'users/{key}'), None)
+
+if __name__ == '__main__':
+    unittest.main()

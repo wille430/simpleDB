@@ -1,7 +1,3 @@
-import os
-import json
-from functools import reduce
-from simpleDB.utils import generate_primary_key
 from .storage import Storage
 from simpleDB.Table import Table
 
@@ -20,6 +16,10 @@ class Database:
 
     def log(self, msg: str):
         print(msg)
+
+    def close(self):
+        self.storage.write(self._tables)
+        self.storage.close()
 
     def tables(self) -> dict[str, Table]:
         """Get all tables in the database"""

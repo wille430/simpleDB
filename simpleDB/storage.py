@@ -44,3 +44,7 @@ class Storage:
             self._file.seek(0)
             # return file content
             return json.load(self._file)
+    
+    def close(self):
+        """Close file context"""
+        self._file.close()
