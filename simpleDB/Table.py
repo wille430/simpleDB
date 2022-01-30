@@ -1,5 +1,5 @@
-from typing import Callable, Mapping, Dict
-
+from typing import Callable, Dict, Mapping
+from simpleDB.query import Query
 from simpleDB.storage import Storage
 from simpleDB.utils import generate_primary_key
 
@@ -90,3 +90,36 @@ class Table:
             return table
 
         self._update_table(remove_row)
+
+    def query(self, fieldName, operation, value, limit = -1) -> Query:
+
+        result = []
+        result_count = 0
+
+        def matches_operation(val1, val2):
+
+            if val1 == None and val2 != None:
+                return False
+
+            match operation:
+                case '==':
+                    return val1 == val2
+                case '>=':
+                    return val1 >= val2
+                case '<=':
+                    return val1 <= val2
+                case '!=':
+                    return val1 != val2
+                # TODO: add <, >
+
+        for row in self.rows().values():
+            if matches_operation(row.setdefault(fieldName, None), value):
+                result_count += 1
+                result.append(row)
+
+            if limit != -1 and result_count > limit:
+                # exit if limit is reached
+                break
+
+
+        return Query(result)
