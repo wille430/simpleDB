@@ -29,9 +29,9 @@ class TestDatabase(unittest.TestCase):
                 'isCool': False
             })
 
-    # def tearDown(self):
+    def tearDown(self):
         # clear db
-        # self.db.clear()
+        self.db.clear()
 
     def test_insert(self):
         value = {
@@ -69,6 +69,9 @@ class TestDatabase(unittest.TestCase):
 
         # expect to be none
         self.assertEqual(self.db.table(self.table_name).find(f'users/{key}'), None)
+
+    def test_clear(self):
+        self.db.clear()
 
 
 if __name__ == '__main__':
