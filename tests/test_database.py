@@ -29,9 +29,9 @@ class TestDatabase(unittest.TestCase):
                 'isCool': False
             })
 
-    # def tearDown(self):
+    def tearDown(self):
         # clear db
-        # self.db.clear()
+        self.db.clear()
 
     def test_insert(self):
         value = {

@@ -1,6 +1,5 @@
 import json
-
-from importlib_metadata import os
+import os
 
 
 class Storage:
@@ -19,6 +18,7 @@ class Storage:
 
         # serialize data
         serialized_data = json.dumps(data)
+        print("Serialized data:", serialized_data)
 
         # write to file
         self._file.write(serialized_data)
