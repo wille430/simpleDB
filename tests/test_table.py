@@ -1,33 +1,14 @@
 import random
 import unittest
 from simpleDB.db import Database
+from tests.utils import populate_database
 
 
 class TestTable(unittest.TestCase):
 
     def setUp(self):
-        self.db = Database()
         self.table_name = 'users'
-
-        cols = {
-            'username': str,
-            'password': str,
-            'age': int,
-            'isCool': bool
-        }
-
-        # create table
-        self.table = self.db.create_table(self.table_name, cols)
-
-       # populate database
-        docs_count = 20
-        for i in range(0, docs_count):
-            self.db.table(self.table_name).insert({
-                'username': '123',
-                'password': '123',
-                'age': 1,
-                'isCool': False
-            })
+        self.db = populate_database(Database(), self.table_name)
 
     def tearDown(self):
         self.db.clear()
@@ -69,6 +50,7 @@ class TestTable(unittest.TestCase):
 
         # expect to be none
         self.assertEqual(self.table.find(f'users/{key}'), None)
+
 
 if __name__ == '__main__':
     unittest.main()

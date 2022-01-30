@@ -1,5 +1,6 @@
 import unittest
 from simpleDB.db import Database
+from tests.utils import populate_database
 
 
 class TestDatabase(unittest.TestCase):
@@ -8,24 +9,7 @@ class TestDatabase(unittest.TestCase):
         self.db = Database()
         self.table_name = 'users'
 
-        cols = {
-            'username': str,
-            'password': str,
-            'age': int,
-            'isCool': bool
-        }
-
-        self.db.create_table(self.table_name, cols)
-
-        # populate database
-        docs_count = 20
-        for i in range(0, docs_count):
-            self.db.table(self.table_name).insert({
-                'username': '123',
-                'password': '123',
-                'age': 1,
-                'isCool': False
-            })
+        self.db = populate_database(self.db)
 
     def tearDown(self):
         # clear db
