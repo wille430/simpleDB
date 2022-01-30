@@ -1,10 +1,9 @@
-from pydoc import doc
-from numpy import random
+import random
 import unittest
 from simpleDB.db import Database
 
 
-class TestDatabase(unittest.TestCase):
+class TestTable(unittest.TestCase):
 
     def setUp(self):
         self.db = Database()
@@ -17,9 +16,10 @@ class TestDatabase(unittest.TestCase):
             'isCool': bool
         }
 
-        self.db.create_table(self.table_name, cols)
+        # create table
+        self.table = self.db.create_table(self.table_name, cols)
 
-        # populate database
+       # populate database
         docs_count = 20
         for i in range(0, docs_count):
             self.db.table(self.table_name).insert({
@@ -29,10 +29,6 @@ class TestDatabase(unittest.TestCase):
                 'isCool': False
             })
 
-    def tearDown(self):
-        # clear db
-        self.db.clear()
-
     def test_insert(self):
         value = {
             'username': '123',
@@ -40,9 +36,9 @@ class TestDatabase(unittest.TestCase):
         }
 
         # insert row
-        row_id = self.db.table(self.table_name).insert(value)
+        row_id = self.table.insert(value)
 
-        self.assertEqual(self.db.table(self.table_name).find(row_id), value)
+        self.assertEqual(self.table.find(row_id), value)
 
     def test_find(self):
         value = {
@@ -51,28 +47,21 @@ class TestDatabase(unittest.TestCase):
         }
 
         # insert row
-        row_id = self.db.table(self.table_name).insert(value)
+        row_id = self.table.insert(value)
 
-        found_doc = self.db.table(self.table_name).find(row_id)
+        found_doc = self.table.find(row_id)
 
         self.assertEqual(found_doc, value)
 
     def test_delete(self):
         # get all keys in dict
-        keys = list(self.db.table(self.table_name).rows().keys())
+        keys = list(self.table.rows().keys())
 
         # get random key
-        key = keys[random.randint(len(keys)-1)]
+        key = keys[random.randint(0, len(keys)-1)]
 
         print(f'Deleting users/{key}')
-        self.db.table(self.table_name).delete(f'users/{key}')
+        self.table.delete(f'users/{key}')
 
         # expect to be none
-        self.assertEqual(self.db.table(self.table_name).find(f'users/{key}'), None)
-
-    def test_clear(self):
-        self.db.clear()
-
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(self.table.find(f'users/{key}'), None)

@@ -4,7 +4,7 @@ import os
 
 class Storage:
     def __init__(self, path='database.db'):
-        self._file = open(path, "r+")
+        self._file = open(path, "w+")
 
         print(f"Loaded db file ({self.size()}b)")
 
@@ -18,17 +18,17 @@ class Storage:
 
         # serialize data
         serialized_data = json.dumps(data)
-        print("Serialized data:", serialized_data)
 
         # write to file
         self._file.write(serialized_data)
+        self._file.truncate()
 
         print(f"Changes written to file ({self.size()}b)")
 
     def read(self):
         # move cursor to first line
         self._file.seek(0)
-        
+
         # if file is empty return empty
         if not self.size():
             return {}

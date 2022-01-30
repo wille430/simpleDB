@@ -40,8 +40,16 @@ class Database:
         self._tables = {}
         self.storage.write({})
 
-    # create table
-    def create_table(self, name, cols):
+    def create_table(self, name: str, cols) -> Table:
+        """
+        Create a table if it doesn't already exist.
+        Returns the table.
+
+        :param name: the name of the table
+        :param cols: a dict where the key is a string and the value a type
+        """
         if not self.table(name):
             table = Table(self.storage, name, cols)
             self._tables[name] = table
+
+        return self._tables[name]
