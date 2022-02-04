@@ -110,7 +110,10 @@ class Table:
                     return val1 <= val2
                 case '!=':
                     return val1 != val2
-                # TODO: add <, >
+                case '>':
+                    return val1 > val2
+                case '<':
+                    return val1 < val2
 
         for row in self.rows().values():
             if matches_operation(row.setdefault(fieldName, None), value):
