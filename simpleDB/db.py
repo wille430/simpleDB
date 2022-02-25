@@ -3,8 +3,8 @@ from simpleDB.Table import Table
 
 
 class Database:
-    def __init__(self):
-        self.storage: Storage = Storage()
+    def __init__(self, encrypt=False):
+        self.storage: Storage = Storage(encrypt=encrypt)
         self._tables: dict[str, Table] = {}
 
     def __exit__(self):

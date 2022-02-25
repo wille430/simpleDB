@@ -1,10 +1,27 @@
 import json
 import os
+from Crypto.Random import get_random_bytes
+from simpleDB.encryption import Encryption
 
 
 class Storage:
-    def __init__(self, path='database.db'):
-        self._file = open(path, "w+")
+    def __init__(self, path='database.db', encrypt=False, encrypted_path='database.bin'):
+        self.file_path = path
+
+        if (encrypt):
+
+            self.encrypted = True
+
+            key = get_random_bytes(16)
+            self.encryption = Encryption(key, encrypted_path)
+            decrypted_data = self.encryption.decrypt()
+
+            self._file = open(path, 'w+')
+            self.write(decrypted_data)
+
+        else:
+            self.encrypted = False
+            self._file = open(path, "w+")
 
         print(f"Loaded db file ({self.size()}b)")
 
@@ -47,4 +64,20 @@ class Storage:
     
     def close(self):
         """Close file context"""
-        self._file.close()
+
+        if (self.encrypted):
+            print('Encrypting data...')
+            self.encryption.encrypt(json.dumps(self.read()))
+
+            print('Closing storage...')
+            self._file.close()
+
+            print(f'Removing decrypted file {self.file_path}...')
+            os.remove(self.file_path)
+        else:
+            print('Closing storage...')
+            self._file.close()
+
+
+
+        print('Storage successfully closed.')
