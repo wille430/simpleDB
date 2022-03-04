@@ -9,6 +9,7 @@ class TestTable(unittest.TestCase):
     def setUp(self):
         self.table_name = 'users'
         self.db = populate_database(Database(), self.table_name)
+        self.table = self.db.table(self.table_name)
 
     def tearDown(self):
         self.db.clear()
