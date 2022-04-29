@@ -1,3 +1,4 @@
+from pydoc import locate
 from .storage import Storage
 from simpleDB.Table import Table
 
@@ -20,30 +21,30 @@ class Database:
         print(msg)
 
     def save(self):
-        serialized_tables = []
+        serialized_tables = {}
 
         for key in self.tables():
-            serialized_tables.append(self.tables()[key].serialize())
+            serialized_tables[key] = self.tables()[key].serialize()
 
-        self.storage.write(lambda x : {**x, "tables": serialized_tables})
-
-
+        self.storage.write(lambda x : {**x, 'tables': serialized_tables})
+        self.storage.save()
 
     def close(self):
+        """Save data and close storage"""
+
         self.save()
         self.storage.close()
     
     def init_tables(self):
-        table_dict = self.storage.read().get('tables', {})
+        """Reads storage and saves database tables in memory."""
+
+        raw_data = self.storage.read()
+
+        table_dict = raw_data.get('tables', {})
 
         for key in table_dict:
             table = table_dict[key]
-
-            print(f"Loading table {key}")
-
-            self._tables[key] = Table(self.storage, table['name'], table['columns'])
-
-
+            self._tables[key] = Table.fromJSON(self.storage, table)
 
     def tables(self) -> dict[str, Table]:
         """Get all tables in the database"""
@@ -69,6 +70,7 @@ class Database:
         :param name: The name of the table
         :param cols: A dict where the key is a string and the value a type
         """
+
         if not self.table(name):
             table = Table(self.storage, name, cols)
             self._tables[name] = table

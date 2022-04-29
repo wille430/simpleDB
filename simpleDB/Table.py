@@ -1,6 +1,8 @@
+from email.policy import default
 import json
-from pstats import SortKey
-from typing import Callable, Dict, Mapping
+from pydoc import locate
+from time import process_time_ns
+from typing import Dict, Mapping
 from simpleDB.query import Query
 from simpleDB.storage import Storage
 from simpleDB.utils import generate_primary_key
@@ -23,7 +25,7 @@ class Table:
         self._columns = columns
         self.rows = self._read_table()
     
-    def serialize_columns(self, data):
+    def serialize_columns(self, data: Dict[str, type]):
         return data.__name__ or data
 
     def _validate_row(self, row: Row):
@@ -101,11 +103,21 @@ class Table:
         return Query(result)
     
     def serialize(self) -> dict:
-        return {
+        serialized = {
             '_name': self._name,
-            '_columns': json.dumps(self._columns, default=self.serialize_columns),
+            '_columns': json.loads(json.dumps(self._columns, default=self.serialize_columns)),
             **self.rows
         }
+        return serialized
     
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)
+
+    @staticmethod
+    def fromJSON(storage: Storage, table_obj):
+        parsed_columns = {}
+
+        for key in table_obj['_columns']:
+            parsed_columns[key] = locate(table_obj['_columns'].get(key))
+
+        return Table(storage, table_obj['_name'], parsed_columns)

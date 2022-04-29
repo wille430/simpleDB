@@ -1,28 +1,41 @@
 import atexit
 import json
 import os
+from pathlib import Path
 from typing import Any, Callable
 # from Crypto.Random import get_random_bytes
 from Cryptodome.Cipher import AES
 
 class Storage:
     def __init__(self, path='database.db', temp_path='_database-temp.db'):
-        self.file_path = temp_path
-        self._out_path = path
+        self.temp_path = temp_path
+        self.out_path = path
 
         self._file = open(temp_path, 'wb+')
-
-        # copy over file content to temporary file
-        with open(path, 'rb') as f:
-            self._file.write(f.read())
-
         self._key = b'Sixteen byte key'
         self._cipher_bytes_start = 32
 
-        print(f"Loaded db file ({self.size()}b)")
-        
-        self._nonce = self._file.read(16)
-        self._tag = self._file.read(16)
+        if Path(path).exists():
+            out_file = open(path, 'rb')
+        else:
+            out_file = open(path, 'wb+')
+
+        # if database file is empty, then start with empty data
+        if os.path.getsize(path) > 0:
+            print("Loading existing database file...")
+            # copy over file content to temporary file
+            self._file.write(out_file.read())
+
+            print(f"Loaded db file ({self.size()}b)")
+            
+            self._file.seek(0)
+            self._nonce = self._file.read(16)
+            self._tag = self._file.read(16)
+        else:
+            print("Creating new db...")
+            self.write({})
+
+        out_file.close()
 
         atexit.register(self.close)
 
@@ -79,7 +92,7 @@ class Storage:
             cipher = AES.new(self._key, AES.MODE_EAX, nonce=self._nonce)
 
             self._file.seek(self._cipher_bytes_start)
-            decrypted_data = cipher.decrypt_and_verify(self._file.read(), self._tag)
+            decrypted_data: bytes = cipher.decrypt_and_verify(self._file.read(), self._tag)
 
             # return file content
             return json.loads(decrypted_data.decode())
@@ -87,4 +100,10 @@ class Storage:
     def close(self):
         """Close file context"""
         self._file.close()
+    
+    def save(self):
+        self._file.seek(0)
+
+        with open(self.out_path, 'wb') as f:
+            f.write(self._file.read())
     

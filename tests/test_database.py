@@ -34,7 +34,7 @@ class TestDatabase(unittest.TestCase):
         print('Reopening encrypted database')
         self.db = Database()
 
-        self.assertEqual(self.db.table(self.table_name), decrypted_data.serialize())
+        self.assertEqual(self.db.table(self.table_name).serialize(), decrypted_data.serialize())
 
 
 
