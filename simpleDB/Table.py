@@ -1,3 +1,5 @@
+import json
+from pstats import SortKey
 from typing import Callable, Dict, Mapping
 from simpleDB.query import Query
 from simpleDB.storage import Storage
@@ -19,6 +21,10 @@ class Table:
         self._storage = storage
         self._name = name
         self._columns = columns
+        self.rows = self._read_table()
+    
+    def serialize_columns(self, data):
+        return data.__name__ or data
 
     def _validate_row(self, row: Row):
         for key, value in row.items():
@@ -29,67 +35,34 @@ class Table:
     def name(self):
         return self._name
 
-    def rows(self) -> Dict[str, Row]:
-        """Get all rows in the table
-
-        :returns: A list with all rows in table
-        """
-
-        table = self._read_table()
-        return table
-
     def insert(self, row: Row):
         # validate row
         self._validate_row(row)
         row_id = generate_primary_key()
-
-        # update callback
-        def update_table(table):
-            table[row_id] = dict(row)
-
+        
         # add row
-        self._update_table(update_table)
+        self.rows[row_id] = row
 
         # return id
         return row_id
 
-    def _update_table(self, callback: Callable):
-        # Get all tables in storage
-        tables = self._storage.read()
-        table = tables.setdefault(self._name, {})
-
-        # call callback
-        callback(table)
-
-        # Write storage
-        self._storage.write(tables)
-
     def find(self, row_id: str) -> Row:
         """Get a row by id"""
-        return self.rows().get(row_id)
+        return self.rows.get(row_id)
 
     def _read_table(self):
         """Get table from database"""
 
-        tables = self._storage.read()
+        tables = self._storage.read().get('tables', {})
 
-        if tables is None:
+        if tables is None or len(tables.keys()) == 0:
             return {}
         else:
             return tables[self._name]
 
     def delete(self, row_id):
         """Delete a row inside the table"""
-
-        def remove_row(table):
-            try:
-                del table[row_id]
-            except:
-                pass
-
-            return table
-
-        self._update_table(remove_row)
+        self.rows.pop(row_id)
 
     def query(self, fieldName, operation, value, limit = -1) -> Query:
 
@@ -115,7 +88,7 @@ class Table:
                 case '<':
                     return val1 < val2
 
-        for row in self.rows().values():
+        for row in self.rows.values():
             if matches_operation(row.setdefault(fieldName, None), value):
                 result_count += 1
                 result.append(row)
@@ -126,3 +99,13 @@ class Table:
 
 
         return Query(result)
+    
+    def serialize(self) -> dict:
+        return {
+            '_name': self._name,
+            '_columns': json.dumps(self._columns, default=self.serialize_columns),
+            **self.rows
+        }
+    
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)

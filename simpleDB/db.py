@@ -3,13 +3,15 @@ from simpleDB.Table import Table
 
 
 class Database:
-    def __init__(self, encrypt=False):
-        self.storage: Storage = Storage(encrypt=encrypt)
+    def __init__(self):
+        self.storage: Storage = Storage()
         self._tables: dict[str, Table] = {}
+
+        self.init_tables()
 
     def __exit__(self):
         print("Saving database...")
-        self.storage.write(self.tables())
+        self.storage.write(lambda x : {**x, "tables": self.tables()})
 
     def _getitem(self, acc_value: dict, upd_value):
         return acc_value.setdefault(upd_value, {})
@@ -17,14 +19,34 @@ class Database:
     def log(self, msg: str):
         print(msg)
 
+    def save(self):
+        serialized_tables = []
+
+        for key in self.tables():
+            serialized_tables.append(self.tables()[key].serialize())
+
+        self.storage.write(lambda x : {**x, "tables": serialized_tables})
+
+
+
     def close(self):
-        self.storage.write(self._tables)
+        self.save()
         self.storage.close()
+    
+    def init_tables(self):
+        table_dict = self.storage.read().get('tables', {})
+
+        for key in table_dict:
+            table = table_dict[key]
+
+            print(f"Loading table {key}")
+
+            self._tables[key] = Table(self.storage, table['name'], table['columns'])
+
+
 
     def tables(self) -> dict[str, Table]:
         """Get all tables in the database"""
-        self._tables = self.storage.read()
-
         return self._tables
 
     def table(self, table_name: str) -> Table:
@@ -38,8 +60,8 @@ class Database:
 
     def clear(self):
         """Resets the entire database"""
-        self._tables = {}
         self.storage.write({})
+        self._tables = {}
 
     def create_table(self, name: str, cols) -> Table:
         """Create a table if it doesn't already exist. Returns the table.

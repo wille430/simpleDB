@@ -41,13 +41,13 @@ class TestTable(unittest.TestCase):
 
     def test_delete(self):
         # get all keys in dict
-        keys = list(self.table.rows().keys())
+        keys = list(self.table.rows.keys())
 
         # get random key
         key = keys[random.randint(0, len(keys)-1)]
 
         print(f'Deleting users/{key}')
-        self.table.delete(f'users/{key}')
+        self.table.delete(f'{key}')
 
         # expect to be none
         self.assertEqual(self.table.find(f'users/{key}'), None)
