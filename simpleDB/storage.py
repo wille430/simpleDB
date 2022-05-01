@@ -99,11 +99,18 @@ class Storage:
         
     def close(self):
         """Close file context"""
-        self._file.close()
-    
+
+        if not self._file.closed:
+            self._file.close()
+
+            try:
+                if os.path.exists(self.temp_path):
+                    os.remove(self.temp_path)
+            except:
+                return
+        
     def save(self):
         self._file.seek(0)
 
         with open(self.out_path, 'wb') as f:
             f.write(self._file.read())
-    

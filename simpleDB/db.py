@@ -29,7 +29,7 @@ class Database:
         self.storage.write(lambda x : {**x, 'tables': serialized_tables})
         self.storage.save()
 
-    def close(self):
+    def save_and_close(self):
         """Save data and close storage"""
 
         self.save()

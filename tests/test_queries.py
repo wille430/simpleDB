@@ -14,7 +14,7 @@ class TestQueries(unittest.TestCase):
 
     def tearDown(self):
         self.db.clear()
-        self.db.close()
+        self.db.save_and_close()
 
     def test_equal(self):
 
