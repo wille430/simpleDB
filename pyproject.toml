@@ -1,7 +1,7 @@
 
 [tool.poetry]
 name = "simpleDB"
-version = "0.1.0"
+version = "0.2.0"
 description = "A simple and lightweight SQL-like database"
 authors = ["William Wigemo <41762983+wille430@users.noreply.github.com>"]
 
