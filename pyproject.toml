@@ -1,12 +1,17 @@
 
 [tool.poetry]
 name = "simpleDB"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple and lightweight SQL-like database"
 authors = ["William Wigemo <41762983+wille430@users.noreply.github.com>"]
+packages = [
+    { include = "simpleDB" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pycryptodomex = "^3.14.1"
+numpy = "^1.22.4"
 
 [tool.poetry.dev-dependencies]
 
